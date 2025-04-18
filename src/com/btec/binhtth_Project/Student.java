@@ -1,7 +1,7 @@
 package com.btec.binhtth_Project;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -42,7 +42,6 @@ class Student {
 class StudentSystem {
     private static Scanner scanner = new Scanner(System.in);
     private static List<Student> students = new ArrayList<>();
-    private static HashMap<String, Student> studentMap = new HashMap<>();
 
     // Add Student
     public static void addStudent() {
@@ -54,9 +53,11 @@ class StudentSystem {
             return;
         }
 
-        if (studentMap.containsKey(id)) {
-            System.out.println("Error: ID " + id + " already exists!");
-            return;
+        for (Student student : students) {
+            if (student.getId().equals(id)) {
+                System.out.println("Error: ID " + id + " already exists!");
+                return;
+            }
         }
 
         System.out.print("Enter name: ");
@@ -75,7 +76,6 @@ class StudentSystem {
             }
             Student student = new Student(id, name, mark);
             students.add(student);
-            studentMap.put(id, student);
             System.out.println("Student added: ID " + id);
         } catch (NumberFormatException e) {
             System.out.println("Error: Mark must be a number!");
@@ -92,10 +92,17 @@ class StudentSystem {
             return;
         }
 
-        Student student = studentMap.remove(id);
-        if (student != null) {
-            students.remove(student);
-            System.out.println("Deleted: " + student);
+        Student studentToDelete = null;
+        for (Student student : students) {
+            if (student.getId().equals(id)) {
+                studentToDelete = student;
+                break;
+            }
+        }
+
+        if (studentToDelete != null) {
+            students.remove(studentToDelete);
+            System.out.println("Deleted: " + studentToDelete);
         } else {
             System.out.println("Error: No student found with ID " + id);
         }
@@ -111,7 +118,14 @@ class StudentSystem {
             return;
         }
 
-        Student student = studentMap.get(id);
+        Student student = null;
+        for (Student s : students) {
+            if (s.getId().equals(id)) {
+                student = s;
+                break;
+            }
+        }
+
         if (student == null) {
             System.out.println("Error: No student found with ID " + id);
             return;
@@ -155,7 +169,7 @@ class StudentSystem {
         }
     }
 
-    // Search Student
+    // Search Student (Linear Search)
     public static void searchStudent() {
         System.out.println("=== Search Student ===");
         System.out.print("Enter student ID to find: ");
@@ -165,9 +179,17 @@ class StudentSystem {
             return;
         }
 
-        Student student = studentMap.get(id);
-        if (student != null) {
-            System.out.println("Found: " + student);
+        // Linear search through the students list
+        Student foundStudent = null;
+        for (Student student : students) {
+            if (student.getId().equals(id)) {
+                foundStudent = student;
+                break;
+            }
+        }
+
+        if (foundStudent != null) {
+            System.out.println("Found: " + foundStudent);
         } else {
             System.out.println("Error: No student found with ID " + id);
         }
@@ -186,6 +208,30 @@ class StudentSystem {
         }
     }
 
+    // Sort Students by Mark
+    public static void sortStudentsByMark() {
+        if (students.isEmpty()) {
+            System.out.println("Error: No students to sort!");
+            return;
+        }
+        System.out.print("Sort by (1) Ascending or (2) Descending? Choose 1 or 2: ");
+        String option = scanner.nextLine().trim();
+        List<Student> sortedList = new ArrayList<>(students);
+        if (option.equals("1")) {
+            sortedList.sort((s1, s2) -> Double.compare(s1.getMark(), s2.getMark()));
+            System.out.println("=== Students Sorted by Mark (Ascending) ===");
+        } else if (option.equals("2")) {
+            sortedList.sort((s1, s2) -> Double.compare(s2.getMark(), s1.getMark()));
+            System.out.println("=== Students Sorted by Mark (Descending) ===");
+        } else {
+            System.out.println("Error: Invalid choice.");
+            return;
+        }
+        for (Student s : sortedList) {
+            System.out.println(s);
+        }
+    }
+
     // Main Menu
     public static void showMenu() {
         while (true) {
@@ -196,8 +242,9 @@ class StudentSystem {
             System.out.println("4. Show student ranking");
             System.out.println("5. Search student");
             System.out.println("6. Display all students");
-            System.out.println("7. Exit");
-            System.out.print("Choose option (1-7): ");
+            System.out.println("7. Sort students by mark");
+            System.out.println("8. Exit");
+            System.out.print("Choose option (1-8): ");
 
             try {
                 int choice = Integer.parseInt(scanner.nextLine());
@@ -221,10 +268,13 @@ class StudentSystem {
                         displayAllStudents();
                         break;
                     case 7:
+                        sortStudentsByMark();
+                        break;
+                    case 8:
                         System.out.println("Exiting the program.");
                         return;
                     default:
-                        System.out.println("Error: Please choose a valid option (1-7).");
+                        System.out.println("Error: Please choose a valid option (1-8).");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Error: Please enter a valid number!");
