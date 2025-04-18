@@ -1,5 +1,6 @@
 package com.btec.haunp_Assignment;
 
+import static com.btec.haunp_Assignment.StudentManager.Student.displayStudentsByScoreDesc;
 import java.util.*;
 
 public class StudentManager {
@@ -11,6 +12,21 @@ public class StudentManager {
         String id;
         String name;
         double score;
+        // Display all students sorted by score descending
+public static void displayStudentsByScoreDesc() {
+    if (studentList.isEmpty()) {
+        System.out.println("No students found.");
+        return;
+    }
+
+    
+    studentList.sort((a, b) -> Double.compare(b.score, a.score));
+
+    System.out.println("List of students (high to low score):");
+    for (Student s : studentList) {
+        s.display();
+    }
+}
 
         public Student(String id, String name, double score) {
             this.id = id;
@@ -34,6 +50,7 @@ public class StudentManager {
                 System.out.println("3. Update student");
                 System.out.println("4. Show ranking");
                 System.out.println("5. Search by ID");
+                System.out.println("6. Display students by score (high to low)");
                 System.out.println("0. Exit");
                 System.out.print("Choose: ");
 
@@ -45,6 +62,7 @@ public class StudentManager {
                     case 3 -> updateStudent();
                     case 4 -> rankStudents();
                     case 5 -> searchStudent();
+                    case 6 -> displayStudentsByScoreDesc();
                     case 0 -> System.out.println("Goodbye.");
                     default -> System.out.println("Wrong choice!");
                 }
@@ -56,8 +74,8 @@ public class StudentManager {
         } while (choice != 0);
     }
 
-    // Add student with duplicate ID and score range check
-public static void addStudent() {
+    // Add student
+    public static void addStudent() {
     try {
         System.out.print("Enter ID: ");
         String id = scanner.nextLine();
@@ -65,7 +83,7 @@ public static void addStudent() {
         // Check if ID already exists
         for (Student s : studentList) {
             if (s.id.equalsIgnoreCase(id)) {
-                System.out.println("❌ This ID already exists. Please use another ID.");
+                System.out.println("This ID already exists. Please use another ID.");
                 return;
             }
         }
@@ -78,19 +96,18 @@ public static void addStudent() {
 
         // Check if score is valid
         if (score < 0 || score > 10) {
-            System.out.println("❌ Score must be between 0 and 10.");
+            System.out.println(" Score must be between 0 and 10.");
             return;
         }
 
         studentList.add(new Student(id, name, score));
-        System.out.println("✅ Student added successfully.");
+        System.out.println("Student added successfully.");
     } catch (NumberFormatException e) {
-        System.out.println("❌ Invalid score. Please enter a number (e.g., 7.5).");
+        System.out.println("Invalid score. Please enter a number (e.g., 7.5).");
     } catch (Exception e) {
-        System.out.println("❌ Error: " + e.getMessage());
+        System.out.println("Error: " + e.getMessage());
     }
 }
-
 
     // Delete student
     public static void deleteStudent() {
@@ -101,7 +118,7 @@ public static void addStudent() {
             System.out.println("Student deleted.");
         else
             System.out.println("Student not found.");
-        }
+    }
 
     // Update student
     public static void updateStudent() {
@@ -148,18 +165,12 @@ public static void addStudent() {
         else return "Excellent";
     }
 
-    // Search by ID
+    // Search by ID 
+    //This is a linear algorithm
     public static void searchStudent() {
         System.out.print("Enter ID to search: ");
         String id = scanner.nextLine();
         for (Student s : studentList) {
-            if (s.id.equalsIgnoreCase(id)) {
-                System.out.println("Student found:");
-                s.display();
-                System.out.println("   → Classification: " + classifyScore(s.score));
-                return;
             }
-        }
-        System.out.println("Student not found.");
     }
 }
